@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Location</string>
+    <string name="google_api_key" translatable="false">AIzaSyCFPpdIjRpRNIAeRsh3PZkN_XlxtAhSpfE </string>
+</resources>

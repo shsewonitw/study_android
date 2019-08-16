@@ -1,10 +1,13 @@
 package com.tje.membermanagement;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AlertDialogLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -43,7 +46,30 @@ public class MainActivity extends AppCompatActivity {
 
         layoutManager = new LinearLayoutManager(this);
         memberRecyclerView.setLayoutManager(layoutManager);
-        memberAdapter = new MemberRecyclerViewAdapter(memberDbHelper);
+        memberAdapter = new MemberRecyclerViewAdapter(memberDbHelper,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        final int position = memberRecyclerView.getChildAdapterPosition(view);
+                        final Member member = memberAdapter.getItem(position);
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setTitle("멤버 삭제");
+                        builder.setMessage("선택된 "+member.getId()+" 아이디를 삭제하시겠습니까?");
+                        builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                memberDbHelper.delete(member);
+                                MainActivity.this.onResume();
+//                                memberAdapter.notifyItemRemoved(position);
+                                memberAdapter.notifyDataSetChanged();
+                                Toast.makeText(MainActivity.this, "삭제완료!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        builder.setNegativeButton("아니요", null);
+                        builder.show();
+                    }
+                });
         memberRecyclerView.setAdapter(memberAdapter);
 
         btn_add.setOnClickListener(new View.OnClickListener(){

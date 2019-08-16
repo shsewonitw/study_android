@@ -4,21 +4,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 public class MemberRecyclerViewAdapter extends RecyclerView.Adapter<MemberRecyclerViewAdapter.ViewHolder>{
 
     MemberDbHelper memberDbHelper;
     ArrayList<Member> list;
+    View.OnClickListener listener;
 
-    public MemberRecyclerViewAdapter(MemberDbHelper memberDbHelper){
+    public MemberRecyclerViewAdapter(MemberDbHelper memberDbHelper, View.OnClickListener listener){
         this.memberDbHelper = memberDbHelper;
+        this.listener = listener;
         loadItems();
     }
 
@@ -57,15 +55,20 @@ public class MemberRecyclerViewAdapter extends RecyclerView.Adapter<MemberRecycl
         holder.phone.setText(member.getPhone());
         holder.address.setText(member.getAddress());
         holder.registDate.setText(member.getRegistDate());
+
+        holder.itemView.setOnClickListener(listener);
     }
 
     @Override
     public int getItemCount() {
-//        return memberDbHelper.count();
         return this.list.size();
     }
 
     public void loadItems(){
         this.list = memberDbHelper.select();
+    }
+
+    public Member getItem(int position){
+        return this.list.get(position);
     }
 }

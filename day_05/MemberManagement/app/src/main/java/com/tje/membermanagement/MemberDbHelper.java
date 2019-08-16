@@ -91,6 +91,11 @@ public class MemberDbHelper extends SQLiteOpenHelper {
         return db.insert(MemberInfo.TABLE_NAME, null ,values) > 0 ? true : false;
     }
 
+    public boolean delete(Member member){
+        SQLiteDatabase db = getWritableDatabase();
+        return db.delete(MemberInfo.TABLE_NAME,MemberInfo.COLUMN_NAME_ID+"=?",new String [] {member.getId()}) > 0 ? true : false;
+    }
+
     public ArrayList<Member> select() {
         SQLiteDatabase db = getReadableDatabase();
         ArrayList<Member> result = new ArrayList<>();
