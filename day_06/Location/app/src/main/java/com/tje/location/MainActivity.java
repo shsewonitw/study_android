@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -18,6 +19,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -70,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private GoogleMap map;
     private MapView mapView;
     private Location lastKnownLocation;
+    private int pinNumber =1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                         new LatLng(lastKnownLocation.getLatitude(),
                                 lastKnownLocation.getLongitude()),DEFAULT_ZOOM));
 
-                updateMyLocation();
+                setMapLongClickEvent();
             }
         });
 
@@ -218,5 +222,55 @@ public class MainActivity extends AppCompatActivity {
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+    private void setMapLongClickEvent(){
+        map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener(){
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                Toast.makeText(MainActivity.this, "위도 "+ latLng.latitude+" 경도 "+latLng.longitude , Toast.LENGTH_SHORT).show();
+
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(latLng);
+                markerOptions.title("핀 "+pinNumber);
+                markerOptions.icon(
+                        BitmapDescriptorFactory.fromResource(R.drawable.ryan2)
+                );
+                map.addMarker(markerOptions);
+                pinNumber = pinNumber + 1;
+                getRoute(latLng);
+            }
+        });
+    }
+
+    private void getRoute(final LatLng endPoint){
+        if(ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) !=
+        PackageManager.PERMISSION_GRANTED &&
+        ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)!=
+        PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+        FusedLocationProviderClient fusedLocationProviderClient = new FusedLocationProviderClient(this);
+        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                Location lastLocation= location;
+                LatLng startPoint = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+                GoogleRouteApi googleRouteApi = new GoogleRouteApi(MainActivity.this, startPoint, endPoint,new GoogleRouteApi.EventListener(){
+                    @Override
+                    public void onApiResult(String result) {
+                        Toast.makeText(MainActivity.this, "요청 성공 : "+result, Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onApiFailed() {
+                        Toast.makeText(MainActivity.this, "요청 실패", Toast.LENGTH_LONG).show();
+                    }
+                });
+                googleRouteApi.start();
+            }
+        });
     }
 }
