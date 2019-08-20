@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditText
+        android:id="@+id/et_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="서버에 전송할 메세지"
+        android:inputType="textPersonName" />
+
+    <Button
+        android:id="@+id/btn_send_get"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="GET 전송" />
+
+    <Button
+        android:id="@+id/btn_send_post"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="POST 전송" />
+
+    <TextView
+        android:id="@+id/tv_receive_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="text"
+        android:textSize="25sp" />
+
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="로그인" />
+
+    <Button
+        android:id="@+id/btn_logout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="로그아웃" />
+</LinearLayout>
