@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     EditText et_tel;
     EditText et_email;
     View join_form;
+    View login_form;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +60,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 join_dialog();
+            }
+        });
+
+        btn_login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                login_dialog();
             }
         });
     }
@@ -145,4 +156,82 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
+    private void login_dialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        login_form = LayoutInflater.from(this).inflate(R.layout.login_form,null);
+        et_id = login_form.findViewById(R.id.et_id);
+        et_pw = login_form.findViewById(R.id.et_pw);
+
+        builder.setView(login_form);
+        builder.setPositiveButton("로그인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                AsyncTask.execute(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        String id = et_id.getText().toString().trim();
+                        String pw = et_pw.getText().toString().trim();
+
+
+
+
+                        String params = String.format("id=%s&pw=%s",
+                                id,pw);
+
+
+
+
+                        String targetURL = "/android_login";
+                        try {
+                            URL endPoint = new URL(HOST_NETWORK_PROTOCOL+
+                                    HOST_ADDRESS +
+                                    HOST_APP_NAME +
+                                    targetURL);
+
+                            HttpURLConnection connection = (HttpURLConnection)endPoint.openConnection();
+                            connection.setRequestMethod("POST");
+                            connection.setDoOutput(true);
+
+                            PrintWriter writer = new PrintWriter(
+                                    new BufferedWriter(new OutputStreamWriter(connection.getOutputStream())));
+
+
+                            writer.print(params);
+                            writer.flush();
+
+                            if(connection.getResponseCode() == HttpURLConnection.HTTP_OK){
+                                BufferedReader in = new BufferedReader(
+                                        new InputStreamReader(
+                                                connection.getInputStream(),"UTF-8"));
+
+                                final String result = in.readLine();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this, result, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+
+
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
 }
